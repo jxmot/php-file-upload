@@ -1,0 +1,20 @@
+# Any file starting with '_' as it indicates a previous version of a file
+# before anything major was done to it.
+_*.*
+# And the following folder(s) -
+node_modules
+/_*
+/nbproject
+/upload
+# misc stuff i want to ignore -
+*.log
+*.txt
+*.bat
+.DS_Store
+# Files created by winmerge - 
+*.*.bak
+# Notepad++ session files.
+*.session
+# Links (FF)
+*.url
+.vscode
