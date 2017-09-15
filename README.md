@@ -25,6 +25,8 @@ Notes and demonstration code for uploading files using PHP
 * [Things I Learned Along the Way](#things-i-learned-along-the-way)
     * [MIME Types](#mime-types)
     * [Browser Differences](#browser-differences)
+* [Summary](#summary)
+
 
 # History
 
@@ -268,7 +270,9 @@ In addition to what was mentioned previously I have also noticed that the file d
 
 It's even more different in IE/Edge, there when a file is selected IE/Edge will display the file path in a read-only text box to the left of the file selection button (*which is also labeled differently*).
 
+# Summary
 
+This was fun. It took me about a day to tinker with the original code and create this repository. And I'm very happy with the results.
 
 
 
