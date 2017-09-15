@@ -6,7 +6,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 </head>
 <body>
-
 <script>
     // when the upload.php file has loaded it will trigger an 
     // event that will be recevied here.
@@ -51,8 +50,15 @@
              It's even more different in IE/Edge, there when a file is selected IE/Edge will display 
              the file path in a read-only text box to the left of the file selection button (which 
              is also labeled differently).
+
+             NOTE: In production code the contents of the `accept` attribute would most likely
+             come from a database or other configuration resource.
         -->
         <input type="file" id="fileselect" name="uploadfile" accept=".htm, .html, .md, .txt" style="width:25%;">
+        <!-- NOTE: in "production" code the value would most likely come from a database
+             or some other configuration source. The intent would be to reuse this code
+             for other files where the destination is different.
+        -->
         <input hidden type="text" id="uploadpath" name="path" value="upload/">
         <br>
         <br>
