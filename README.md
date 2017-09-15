@@ -10,7 +10,7 @@ Notes and demonstration code for uploading files using PHP
     * [Changed Behaviors](#changed-behaviors)
 * [Running the Application](#running-the-application)
     * [How it Works](#how-it-works)
-        * [Load](#load)
+        * [Load index.php](#load-index.php)
         * [Begin Upload](#begin-upload)
         * [Upload File and Verify](#upload-file-and-verify)
         * [Respond with Status](#respond-with-status)
@@ -87,11 +87,11 @@ Place the following into a folder within the *document root* of your server -
       |
       ---- test/                <- you will create this folder
               |
-              ---- index.php    <- add this files to the new folder
+              ---- index.php    <- add this file to the new folder
               |
               ---- upload.php   <- add this one
               |
-              ---- phpinfo.php  <- and this one too
+              ---- phpinfo.php  <- and this one too, just in case
               |
               ---- upload/      <- this folder must be created              
 ```
@@ -118,7 +118,7 @@ Then click the **Upload** button and you should see this -
 
 ## How it Works
 
-### Load `index.pgp`
+### Load index.php
 
 <p align="center">
   <img src="./mdimg/flow-1.png" alt="Index Page Load" txt="Index Page Load Flow Chart"/>
