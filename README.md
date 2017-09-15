@@ -10,7 +10,7 @@ Notes and demonstration code for uploading files using PHP
     * [Changed Behaviors](#changed-behaviors)
 * [Running the Application](#running-the-application)
     * [How it Works](#how-it-works)
-        * [Load index.php](#load-index.php)
+        * [Load index](#load-index)
         * [Begin Upload](#begin-upload)
         * [Upload File and Verify](#upload-file-and-verify)
         * [Respond with Status](#respond-with-status)
@@ -118,7 +118,7 @@ Then click the **Upload** button and you should see this -
 
 ## How it Works
 
-### Load index.php
+### Load index
 
 <p align="center">
   <img src="./mdimg/flow-1.png" alt="Index Page Load" txt="Index Page Load Flow Chart"/>
