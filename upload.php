@@ -49,11 +49,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         $filesize = $_FILES["uploadfile"]["size"];
         $filepath = $_POST["path"];
 
-        echo "File Name : " . $filename . "<br>";
-        echo "File Type : " . $filetype . "<br>";
-        echo "File Size : " . (($filesize / 1024) | 0) . " KB<br>";
+        echo "File Name : " . $filename . "<br>\n";
+        echo "File Type : " . $filetype . "<br>\n";
+        echo "File Size : " . (($filesize / 1024) | 0) . " KB<br>\n";
 
-        echo "Uploaded to : {$tmpfile}<br><br><br>";
+        echo "Uploaded to : {$tmpfile}<br><br><br>\n";
 
         // Verify file extension
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
@@ -62,14 +62,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         if(!array_key_exists($ext, $allowed)) {
             $errmsg = "Please select a valid file format, {$ext} is not allowed";
             $error  = -5;
-            echo "Error: " . $errmsg . "<br>";
+            echo "Error: " . $errmsg . "<br>\n";
         } else {
             // Verify file size - 100k maximum
             $maxsize = 100 * 1024;
             if($filesize > $maxsize) {
                 $errmsg = "File size of {$filesize} is larger than the allowed limit of {$maxsize}";
                 $error  = -6;
-                echo "Error: " . $errmsg . "<br>";
+                echo "Error: " . $errmsg . "<br>\n";
             } else {
                 // Verify MYME type of the file
                 if(in_array($filetype, $allowed)){
@@ -77,47 +77,57 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                     if(file_exists($filepath . $filename)) {
                         $errmsg = "{$filename} already exists in {$filepath}";
                         $error  = -1;
-                        echo "Error: " . $errmsg . "<br>";
+                        echo "Error: " . $errmsg . "<br>\n";
                     } else {
                         if(move_uploaded_file($_FILES["uploadfile"]["tmp_name"], $filepath . $filename)) {
-                            echo "Your file was uploaded & moved successfully.<br>";
+                            echo "Your file was uploaded & moved successfully.<br>\n";
                             $ufiletype = mime_content_type($filepath . $filename);
-                            echo "uploaded file type : {$ufiletype}<br>";
-                            echo "path     : " . $filepath . "<br><br>";
+                            echo "uploaded file type : {$ufiletype}<br>\n";
+                            echo "path     : " . $filepath . "<br><br>\n";
     
                             $errmsg = "The file {$filename} uploaded successfully";
                             $error  = 0;
                         } else {
                             $errmsg = "The file {$filename} could not be moved to {$filepath}";
                             $error  = -7;
-                            echo "Error: " . $errmsg . "<br>";
+                            echo "Error: " . $errmsg . "<br>\n";
                         }
                     } 
                 } else {
                     $ret = in_array($filetype, $allowed);
-                    echo "in_array : " . $ret . "<br>";
-                    echo "filetype : " . $filetype . "<br>";
+                    echo "in_array : " . $ret . "<br>\n";
+                    echo "filetype : " . $filetype . "<br>\n";
         
                     $errmsg = "the file type {$filetype} is not allowed";
                     $error  = -2;
-                    echo "Error: " . $errmsg . "<br>";
+                    echo "Error: " . $errmsg . "<br>\n";
                 }
             }
         }
     } else {
         $errmsg = "upload error - {$_FILES["uploadfile"]["error"]}";
         $error  = -3;
-        echo "Error: " . $errmsg . "<br>";
+        echo "Error: " . $errmsg . "<br>\n";
     }
 } else {
     $errmsg = "bad request - {$_SERVER["REQUEST_METHOD"]}";
     $error  = -4;
-    echo "Error: " . $errmsg . "<br>";
+    echo "Error: " . $errmsg . "<br>\n";
 }
 ?>
 <script>
-    var err      = {msg: '<?php echo $errmsg; ?>', code: <?php echo $error; ?>};
-    var fileinfo = {file: '<?php echo $filename; ?>', type: '<?php echo $ufiletype; ?>', size: <?php echo $filesize; ?>, path: '<?php echo $filepath; ?>', status: err};
+    var err      =  {
+                        msg: '<?php echo $errmsg; ?>', 
+                        code: <?php echo $error; ?>
+                    };
+
+    var fileinfo =  {
+                        file: '<?php echo $filename; ?>', 
+                        type: '<?php echo $ufiletype; ?>', 
+                        size: <?php echo $filesize; ?>, 
+                        path: '<?php echo $filepath; ?>', 
+                        status: err
+                    };
     var event = new CustomEvent('upload_complete_evt', {detail: fileinfo});
     window.parent.document.dispatchEvent(event);
 </script>
