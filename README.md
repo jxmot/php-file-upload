@@ -2,6 +2,30 @@
 
 Notes and demonstration code for uploading files using PHP
 
+# Table of Contents
+
+* [History](#history)
+* [Requirements](#requirements)
+* [Application Overview](#application-overview)
+    * [Changed Behaviors](#changed-behaviors)
+* [Running the Application](#running-the-application)
+    * [How it Works](#how-it-works)
+        * [Load](#load)
+        * [Begin Upload](#begin-upload)
+        * [Upload File and Verify](#upload-file-and-verify)
+        * [Respond with Status](#respond-with-status)
+    * [Success Indicators](#success-indicators)
+    * [Failure Indicators](#failure-indicators)
+        * [Error Codes and Messages](#error-codes-and-messages)
+        * [Trouble Shooting](#trouble-shooting)
+    * [Browser Behaviors](#browser-behaviors)
+        * [Chrome](#chrome)
+        * [FireFox](#fireFox)
+        * [Microsoft Edge](#nicrosoft-edge)
+* [Things I Learned Along the Way](#things-i-learned-along-the-way)
+    * [MIME Types](#mime-types)
+    * [Browser Differences](#browser-differences)
+
 # History
 
 I had been looking for a way to upload files via my browser to my website. I could have used SFTP but this was to be part of a larger application. And that application required a means to upload files.
@@ -50,10 +74,6 @@ The following items have been modified :
     * Changed the uploaded file size calculation from `($filesize / 1024)` to `(($filesize / 1024) | 0)` which removes digits to the *right* of the decimal point.
     * The logic around the calls to `die()` have been rewritten to fall through to the event trigger. The event payload contains an error code and an error message string.
 
-## Additional Modifications
-
-**_TBD_**
-
 # Running the Application
 
 Place the following into a folder within the *document root* of your server -
@@ -94,7 +114,29 @@ Then click the **Upload** button and you should see this -
 
 ## How it Works
 
+### Load `index.pgp`
 
+<p align="center">
+  <img src="./mdimg/flow-1.png" alt="Index Page Load" txt="Index Page Load Flow Chart"/>
+</p>
+
+### Begin Upload
+
+<p align="center">
+  <img src="./mdimg/flow-2.png" alt="Index Page Upload File Begin" txt="Index Page Begin Upload"/>
+</p>
+
+### Upload File and Verify
+
+<p align="center">
+  <img src="./mdimg/flow-3.png" alt="Upload Page Upload and Verify" txt="Upload Page Upload and Verify"/>
+</p>
+
+### Respond with Status
+
+<p align="center">
+  <img src="./mdimg/flow-4.png" alt="Upload Page Upload and Verify" txt="Upload Page Upload and Verify"/>
+</p>
 
 ## Success Indicators
 
@@ -171,7 +213,60 @@ Try checking the following -
 
 ## Browser Behaviors
 
-## Customizing the Code
+I tested with three browsers : 
+
+* FireFox 55.0.3 (64-bit)
+* Google Chrome 61.0.3163.91 (Official Build) (64-bit) - my primary testing & debug browser
+* Microsoft Edge 40.15063.0.0
+
+### Chrome
+
+The page images used in this document came from a Chrome rendering of the page(s);
+
+### FireFox
+
+FireFox pretty much looks and operates the same as Chrome.
+
+### Microsoft Edge
+
+This is a little different. After the file is selected the path + file name will show up in a read-only text-like control to the left of the *Browse...* button.
+
+<p align="center">
+  <img src="./mdimg/screenshot-3.png" alt="Index Page - successful file upload" txt="Index Page - successful file upload"/>
+</p>
+
+# Things I Learned Along the Way
+
+Here are some things I learned as I worked on the code for this application...
+
+##  MIME Types
+
+After I had read through a few sources it appeared to me that t using the browser supplied MIME type is unreliable. 
+That's because Windows (*or the OS hosting browser*) determines the MIME type. You can view some of the types using regedit. Go to - 
+
+   `Computer\HKEY_CLASSES_ROOT\MIME\Database\Content Type`
+
+to see the default types. 
+
+**IMPORTANT:** I do NOT recommend editing any of the registry entries.
+
+It appears that if a file type (".md" for example) isn't found in the registry that the default type will be  `application/octet-stream`.
+
+It's probably better to call the PHp function **mime_content_type()** to determine the file's MIME type *after it's been uploaded*. 
+
+Here are a couple of resources that I found informative :
+
+<http://php.net/manual/en/features.file-upload.post-method.php>
+
+<https://stackoverflow.com/questions/1201945/how-is-mime-type-of-an-uploaded-file-determined-by-browser>
+
+## Browser Differences
+
+In addition to what was mentioned previously I have also noticed that the file dialog is different between FireFox and Chrome. In Firefox the discrete file types are seen in the drop-down. But in chrome you will only see "Custom Files".
+
+It's even more different in IE/Edge, there when a file is selected IE/Edge will display the file path in a read-only text box to the left of the file selection button (*which is also labeled differently*).
 
 
-# IHNFC
+
+
+
