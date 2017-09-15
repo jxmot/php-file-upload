@@ -12,7 +12,7 @@
     // event that will be recevied here.
     window.document.addEventListener('upload_complete_evt', handleEvent, false)
     function handleEvent(e) {
-        console.log('GOT IT : '+JSON.stringify(e.detail));
+        console.log('GOT IT : ' + JSON.stringify(e.detail));
         $('#file-status').show();
     }
 </script>
@@ -60,7 +60,7 @@
     </form>
 
     <div id="file-status" hidden>
-        <iframe name="file-iframe" src="text-upload-manager.php" style="width:50%;"></iframe>
+        <iframe name="file-iframe" style="width:50%;"></iframe>
     </div>
 
 </body>
