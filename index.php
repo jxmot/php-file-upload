@@ -53,6 +53,7 @@
              is also labeled differently).
         -->
         <input type="file" id="fileselect" name="uploadfile" accept=".htm, .html, .md, .txt" style="width:25%;">
+        <input hidden type="text" id="uploadpath" name="path" value="upload/">
         <br>
         <br>
         <input type="submit" name="submit" value="Upload">
