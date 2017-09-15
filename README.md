@@ -26,7 +26,9 @@ Notes and demonstration code for uploading files using PHP
     * [MIME Types](#mime-types)
     * [Browser Differences](#browser-differences)
 * [Summary](#summary)
-
+* [To Do](#to-do)
+    * [Fix Extension and MIME Type Checking](#fix-extension-and-mime-type-checking) 
+        * [Status](#status)
 
 # History
 
@@ -274,5 +276,79 @@ It's even more different in IE/Edge, there when a file is selected IE/Edge will 
 
 This was fun. It took me about a day to tinker with the original code and create this repository. And I'm very happy with the results.
 
+# To Do
 
+## Fix Extension and MIME Type Checking
+
+**Condition:**
+
+In `upload.php` examine how `$allowed` is being used. In the original code and in the early version of my modified code `$allowed` is an *associative array*. However, it isn't being used as such except by calling `array_key_exists()` when the uploaded file extension is checked. 
+
+Later on in the code `in_array()` is called when the MIME type is checked. 
+
+**Problem:**
+
+The code does not make any association between the extension (*a key to* `$array`) and the type. Depending on how `$allow` is filled in the checks of extension and type will *pass*. This is true even if the extension and type are **not** actually associated.
+
+**Example:**
+
+Using the following - 
+```
+$allowed = array("htm" => "text/html", "html" => "text/html", "md" => "text/html", "txt" => "text/plain", "bin" => "application/octet-stream");
+```
+
+When a file of the type `md` is uploaded the browser will interpret it as `application/octet-stream`. Even though it is really `text/html`. So that means the extension check will pass, and so will the type check. But for the wrong reason. This will be true for any allowed extension.
+
+**Solution:**
+
+There are a few potential solutions. The first (*implemented in my modified code*) is to ignore the file type provided by the browser. Instead the file type is determined by calling `mime_content_type()` on the uploaded file. The type returned by that function will be correct. See [MIME Types](#mime-types) for more information. And for a lengthy list of MIME types see - 
+
+<https://www.freeformatter.com/mime-types-list.html#mime-types-list>
+
+At this point the use of an associative array (`$allowed`) does not serve any real puropose unless a code modification is made. Here is a psuedo code description of the modification - 
+
+**Original/Current:**
+
+```php
+
+  // This is the real file type...
+  $filetype = mime_content_type($tmpfile);
+  
+  // The original extension test - 
+  if(!array_key_exists($ext, $allowed)) {
+      // ERROR!
+  } else {
+  
+      // execute some code
+    
+      // check the file type
+      if(in_array($filetype, $allowed)) {
+          // execute some code
+      } else {
+          // ERROR!
+      }
+  }
+
+```
+
+**Modification:**
+
+```php
+
+  // This is the real file type...
+  $filetype = mime_content_type($tmpfile);
+  
+  // The modified test, making use of the assocative 
+  // aspects of the aray - 
+  if((array_key_exists($ext, $allowed) && ($allowed[$ext] === $filetype)) {
+      // execute some code
+  } else {
+      // ERROR!
+  }
+
+```
+
+### Status
+
+This is a *work in progress*. So far I've partially implemented it, the code will ignore the browser supplied MIME type.
 
