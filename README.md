@@ -136,8 +136,38 @@ If `{status : {code}}` is any value *less than zero* an error has occured. Here'
 }
 ```
 
+### Error Codes and Messages
+
+The following errors are possible, and announced via the data sent in the `upload_complete_evt` event.
+
+* **msg:** "The file FILE.EXT uploaded successfully" **code:** 0
+* **msg:** "FILE.EXT already exists in PATH" **code:** -1
+* **msg:** "the file type .EXT is not allowed" **code:** -2 
+* **msg:** upload error - ERROR_INFO"" **code:** -3
+* **msg:** "bad request - METHOD" **code:** -4
+* **msg:** "Please select a valid file format, .EXT is not allowed" **code:** -5
+* **msg:** "File size of XXXX is larger than the allowed limit of YYYY" **code:** -6
+* **msg:** "The file FILE.EXT could not be moved to PATH" **code:** -7
+
+Most of the messages are self explanatory, but here is the meaning of the text in upper case :
+
+* FILE.EXT - the file name plus extension of the file that was to be uploaded
+* PATH - the final destination of the uploaded file
+* .EXT - the extension of the uploaded file
+* ERROR_INFO - a string obtained in `upload.php`, it comes from `$_FILES["uploadfile"]["error"]`
+* METHOD - the method used when `upload.php` was requested
+* XXXX - the size in bytes of the file
+* YYYY - the maximum size allowed for uploads
 
 ### Trouble Shooting
+
+Try checking the following - 
+
+* Does your server have PHP installed? Load the `phpinfo.php` file to check.
+* Is the file type (*extension*) allowed by `upload.php`?
+* Is the file too large? The limit is 100k.
+* Does the `upload` folder exist where `index.php` and `upload.php` are kept?
+* Did you have a *good* breakfast today?
 
 ## Browser Behaviors
 
