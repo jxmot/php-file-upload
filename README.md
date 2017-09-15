@@ -242,7 +242,9 @@ Here are some things I learned as I worked on the code for this application...
 ##  MIME Types
 
 After I had read through a few sources it appeared to me that t using the browser supplied MIME type is unreliable. 
-That's because Windows (*or the OS hosting browser*) determines the MIME type. You can view some of the types using regedit. Go to - 
+That's because Windows (*or the OS hosting browser*) determines the MIME type. You can view some of the types using regedit. 
+
+Go to - 
 
    `Computer\HKEY_CLASSES_ROOT\MIME\Database\Content Type`
 
