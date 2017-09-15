@@ -45,20 +45,22 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         if(!array_key_exists($ext, $allowed)) {
             $errmsg = "Please select a valid file format, {$ext} is not allowed";
             $error  = -5;
+            echo "Error: " . $errmsg . "<br>";
         } else {
             // Verify file size - 100k maximum
             $maxsize = 100 * 1024;
             if($filesize > $maxsize) {
                 $errmsg = "File size of {$filesize} is larger than the allowed limit of {$maxsize}";
                 $error  = -6;
+                echo "Error: " . $errmsg . "<br>";
             } else {
                 // Verify MYME type of the file
                 if(in_array($filetype, $allowed)){
                     // Check whether file exists before uploading it
                     if(file_exists($filepath . $filename)) {
-                        echo "{$filename} is already present in {$filepath}<br>";
-                        $errmsg = "file exists";
+                        $errmsg = "{$filename} already exists in {$filepath}";
                         $error  = -1;
+                        echo "Error: " . $errmsg . "<br>";
                     } else {
                         if(move_uploaded_file($_FILES["uploadfile"]["tmp_name"], $filepath . $filename)) {
                             echo "Your file was uploaded & moved successfully.<br>";
@@ -71,27 +73,29 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                         } else {
                             $errmsg = "The file {$filename} could not be moved to {$filepath}";
                             $error  = -7;
+                            echo "Error: " . $errmsg . "<br>";
                         }
                     } 
                 } else {
-                    echo "Error: There was a problem uploading your file. Please try again.<br><br>";
                     $ret = in_array($filetype, $allowed);
-                    echo "in_array : " . $ret . "<br><br>";
-                    echo "filetype : " . $filetype . "<br><br>";
+                    echo "in_array : " . $ret . "<br>";
+                    echo "filetype : " . $filetype . "<br>";
         
                     $errmsg = "the file type {$filetype} is not allowed";
                     $error  = -2;
+                    echo "Error: " . $errmsg . "<br>";
                 }
             }
         }
     } else {
-        echo "Error: " . $_FILES["uploadfile"]["error"];
-        $errmsg = "Error: {$_FILES["uploadfile"]["error"]}";
+        $errmsg = "upload error - {$_FILES["uploadfile"]["error"]}";
         $error  = -3;
+        echo "Error: " . $errmsg . "<br>";
     }
 } else {
     $errmsg = "bad request - {$_SERVER["REQUEST_METHOD"]}";
     $error  = -4;
+    echo "Error: " . $errmsg . "<br>";
 }
 ?>
 <script>
