@@ -52,16 +52,96 @@ The following items have been modified :
 
 ## Additional Modifications
 
-I also mad some code styling changes, mostly replacing double quotes with single quotes withing the JavaScript code.
+**_TBD_**
 
 # Running the Application
+
+Place the following into a folder within the *document root* of your server -
+
+```
+/ document root folder
+      |
+      ---- test/                <- you will create this folder
+              |
+              ---- index.php    <- add this files to the new folder
+              |
+              ---- upload.php   <- add this one
+              |
+              ---- phpinfo.php  <- and this one too
+              |
+              ---- upload/      <- this folder must be created              
+```
+
+**NOTE :** I was using *Chrome* during the following steps :
+
+Open your browser and point it to the server - `http://your-server/test/`
+
+You *should* see the following - 
+
+<p align="center">
+  <img src="./mdimg/screenshot-1.png" alt="Index Page" txt="Index Page"/>
+</p>
+
+The click on the **Choose File** button and select a file to upload. This application will accept .htm, .html, .md, and .txt files.
+
+Once you've seleted a file its name will appear next to the **Choose File** button.
+
+Then click the **Upload** button and you should see this - 
+
+<p align="center">
+  <img src="./mdimg/screenshot-2.png" alt="Index Page - successful file upload" txt="Index Page - successful file upload"/>
+</p>
+
+## How it Works
+
 
 
 ## Success Indicators
 
+This time open the *developers tool* window by right-clicking anywhere on the displayed page. Refresh the browser to reload the page. Then run the application again and upload a different file. Notice the console pane in the developer tool window, and should see output similar to this - 
+
+`GOT IT : {"file":"css.md","type":"text/plain","size":6826,"path":"upload/","status":{"msg":"The file css.md uploaded successfully","code":0}}`
+
+Here's the same output JSON, but just a little *prettier* - 
+
+```
+{
+  "file": "css.md",
+  "type": "text/plain",
+  "size": 6826,
+  "path": "upload/",
+  "status": {
+    "msg": "The file css.md uploaded successfully",
+    "code": 0
+  }
+}
+```
+
+Success! The file was uploaded without any errors.
+
 ## Failure Indicators
 
+If `{status : {code}}` is any value *less than zero* an error has occured. Here's an example of what the JSON looks like due to an error - 
+
+```
+{
+  "file": "temp.log",
+  "type": "text/plain",
+  "size": 6826,
+  "path": "upload/",
+  "status": {
+    "msg": "Please select a valid file format, .log is not allowed",
+    "code": -5
+  }
+}
+```
+
+
+### Trouble Shooting
+
 ## Browser Behaviors
+
+## Customizing the Code
 
 
 # IHNFC
