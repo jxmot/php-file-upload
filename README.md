@@ -301,7 +301,7 @@ When a file of the type `md` is uploaded the browser will interpret it as `appli
 
 **Solution:**
 
-There are a few potential solutions. The first (*implemented in my modified code*) is to ignore the file type provided by the browser. Instead the file type is determined by calling `mime_content_type()` on the uploaded file. The type returned by that function will be correct. See [MIME Types](#mime-types) for more information. And for a lengthy list of MIME types see - 
+The solution I have chosen (*implemented in my modified code*) is to ignore the file type provided by the browser. Instead the file type is determined by calling `mime_content_type()` on the file *after* it's been uploaded. The type returned by that function will be correct. See [MIME Types](#mime-types) for more information. And for a lengthy list of MIME types see - 
 
 <https://www.freeformatter.com/mime-types-list.html#mime-types-list>
 
@@ -350,5 +350,5 @@ At this point the use of an associative array (`$allowed`) does not serve any re
 
 ### Status
 
-This is a *work in progress*. So far I've partially implemented it, the code will ignore the browser supplied MIME type.
+This is a *work in progress*. So far I've partially implemented it, the code will ignore the browser supplied MIME type. The next step is to rewrite the portion of code that checks the file.
 
