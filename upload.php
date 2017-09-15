@@ -22,7 +22,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check if file was uploaded without errors
     if(isset($_FILES["uploadfile"]) && $_FILES["uploadfile"]["error"] == 0) {
 
-        $allowed = array("htm" => "text/html", "html" => "text/html", "md" => "text/html", "txt" => "text/plain", "log" => "application/octet-stream");
+        $allowed = array("htm" => "text/html", "html" => "text/html", "md" => "text/html", "txt" => "text/plain");
 
         $filename = $_FILES["uploadfile"]["name"];
         $filetype = $_FILES["uploadfile"]["type"];
