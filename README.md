@@ -34,22 +34,32 @@ This application consists of two PHP files -
 The following items have been modified : 
 
 * File types - I've modified the original code to accept: .htm, .html, .md, and .txt *instead* of .jpg, .jpeg, .gif, and .png
-* Form page behavior:
+* Added comments everywhere.
+
+* `index.php` behavior:
     * The original code would redirect to the page output created by `upload.php` (*originally* `file-upload-form.php`). I've modified the form with `target="file-iframe"`.
     * Found a missing closing `>`, added it.
     * Changed the *name* of the `<input type="file">` tag from `photo` to `uploadfile`.
     * Added the style `style="width:25%;"` to `<input type="file">` so that the upload path+file is visible in browsers that display it.
     * Added an `iframe`, this will contain the output from `upload.php`.
-    * Added a listener for an event trigger. This event is sent from `upload.php` and is used to indicate completion. It will be triggered on success or failure to upload.
-* The file `upload.php` has been extensively modified. The logic around the calls to `die()` have been rewritten to fall through to the event trigger. The event payload contains an error code and an error message string.
-* Added comments everywhere.
+    * Added a listener for an event trigger. This event is sent from `upload.php` and is used to indicate completion. It will be triggered on success or failure to upload. __*see details below*__
+    * Added a *hidden* text field. It contains the upload destination path, and will be used instead of what *was* hardcoded previously.
+
+* `upload.php` behavior :
+    * Added an `else` to `if($_SERVER["REQUEST_METHOD"] == "POST")`.
+    * Changed the uploaded file size calculation from `($filesize / 1024)` to `(($filesize / 1024) | 0)` which removes digits to the *right* of the decimal point.
+    * The logic around the calls to `die()` have been rewritten to fall through to the event trigger. The event payload contains an error code and an error message string.
 
 ## Additional Modifications
 
-
+I also mad some code styling changes, mostly replacing double quotes with single quotes withing the JavaScript code.
 
 # Running the Application
 
+
+## Success Indicators
+
+## Failure Indicators
 
 ## Browser Behaviors
 
