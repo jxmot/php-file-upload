@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Upload - Drag and Drop</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+<body>
+    <style>
+        <!-- obtained from - 
+                https://www.webcodegeeks.com/html5/html5-file-upload-example/
+        -->
+        .example {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        #drop_zone {
+            border: 2px dashed #bbb;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            padding: 25px;
+            text-align: center;
+            font: 20pt bold 'Vollkorn';
+            color: #bbb;
+        }
+    </style>
+
+    <div class="example">
+        <div id="drop_zone">Drop files here</div>
+        <output id="list"></output>
+    </div>
+
+    <p id="statusmsg"></p>
+
+    <script>
+        // obtained from - 
+        //      https://www.html5rocks.com/en/tutorials/file/dndfiles/
+        //
+        function handleFileSelect(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+        
+            $('#statusmsg').empty();
+
+            var files = evt.dataTransfer.files; // FileList object.
+        
+            // files is a FileList of File objects. List some properties.
+            var output = [];
+            for(var ix = 0, file; file = files[ix]; ix++) {
+                output.push('<li><strong>', escape(file.name), '</strong> (', file.type || 'n/a', ') - ',
+                            file.size, ' bytes, last modified: ',
+                            file.lastModifiedDate ? file.lastModifiedDate.toLocaleDateString() : 'n/a',
+                            '</li>');
+
+                uploadFile(file);
+            }
+            document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+        }
+        
+        function handleDragOver(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            // Explicitly show this is a copy.
+            evt.dataTransfer.dropEffect = 'copy';
+        }
+        
+        // Setup the dnd listeners.
+        var dropZone = document.getElementById('drop_zone');
+        dropZone.addEventListener('dragover', handleDragOver, false);
+        dropZone.addEventListener('drop', handleFileSelect, false);
+
+        // partially obtained from - 
+        //      https://www.webcodegeeks.com/html5/html5-file-upload-example/
+        // 
+        // except $('#statusmsg').html(...)
+        //
+        function uploadFile(file) {
+            var url = 'upload-dnd.php';
+            var xhr = new XMLHttpRequest();
+            var fd = new FormData();
+            xhr.open("POST", url, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    // Every thing ok, file uploaded
+                    console.log('GOT IT : ' + xhr.responseText);
+                    var resp = JSON.parse(xhr.responseText);
+                    $('#statusmsg').html('Upload Result : [' + resp.detail.status.msg + '] code = ' + resp.detail.status.code);
+                }
+            };
+            fd.append("path", "upload/");
+            fd.append("uploadfile", file);
+            xhr.send(fd);
+        }
+    </script>
+</body>
+</html>

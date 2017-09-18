@@ -1,2 +1,6 @@
-https://www.tutorialrepublic.com/php-tutorial/php-file-upload.php
+source: https://www.tutorialrepublic.com/php-tutorial/php-file-upload.php
+file(s): file-upload-form.php, upload-manager.php
+
+source: https://www.webcodegeeks.com/html5/html5-file-upload-example/
+file(s): html5-file-upload-example.zip
 
