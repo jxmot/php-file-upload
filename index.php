@@ -37,8 +37,9 @@
          MIME type. However, with the code below it isn't possible to check the 
          type prior to initiating the form's "action".
 
-    -->
     <form action="upload.php" method="post" enctype="multipart/form-data" target="file-iframe">
+    -->
+    <form action="_scratch.php" method="post" enctype="multipart/form-data" target="file-iframe">
         <h2>Upload File</h2>
         <label for="fileSelect">Filename:</label>
         <!-- Also see : https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file -->
@@ -60,6 +61,15 @@
              for other files where the destination is different.
         -->
         <input hidden type="text" id="uploadpath" name="path" value="upload/">
+        <!-- 
+            set the desired reponse type :
+
+                html - outputs an HTML formatted page suitable for display and sends
+                       and event to the parent if located in an iframe.
+
+                json - outputs a JSON formatted string, this is the default
+        -->
+        <input hidden type="text" id="uploadresp" name="rtype" value="html">
         <br>
         <br>
         <input type="submit" name="submit" value="Upload">

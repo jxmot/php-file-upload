@@ -28,14 +28,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         $tmpfile  = $_FILES["uploadfile"]["tmp_name"];
         // NOTE: The exact location is determined by settings in your HTTP server.
     
-        // This is the real file type...
-        $filetype = mime_content_type($tmpfile);
-
         $filesize = $_FILES["uploadfile"]["size"];
         $filepath = $_POST["path"];
 
         // Verify file extension
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
+
+        // This is the real file type...
+        $filetype = mime_content_type($tmpfile);
 
         // is the extension allowed?
         if(!array_key_exists($ext, $allowed)) {

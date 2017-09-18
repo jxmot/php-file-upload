@@ -43,11 +43,16 @@
         
             $('#statusmsg').empty();
 
-            var files = evt.dataTransfer.files; // FileList object.
+            var files = evt.dataTransfer.files;
         
-            // files is a FileList of File objects. List some properties.
             var output = [];
             for(var ix = 0, file; file = files[ix]; ix++) {
+                // NOTE: This is another place where the MIME typs is wrong. 
+                // For example, a .md file is text/plain but here file.type
+                // is undefined. And it seems that application/octet-stream
+                // is the "default". The odd thing is that the POST handler
+                // (upload_dnd.php) can check the file and see the correct
+                // MIME type.
                 output.push('<li><strong>', escape(file.name), '</strong> (', file.type || 'n/a', ') - ',
                             file.size, ' bytes, last modified: ',
                             file.lastModifiedDate ? file.lastModifiedDate.toLocaleDateString() : 'n/a',
@@ -76,7 +81,8 @@
         // except $('#statusmsg').html(...)
         //
         function uploadFile(file) {
-            var url = 'upload-dnd.php';
+            //var url = 'upload-dnd.php';
+            var url = '_scratch.php';
             var xhr = new XMLHttpRequest();
             var fd = new FormData();
             xhr.open("POST", url, true);
@@ -88,8 +94,17 @@
                     $('#statusmsg').html('Upload Result : [' + resp.detail.status.msg + '] code = ' + resp.detail.status.code);
                 }
             };
-            fd.append("path", "upload/");
-            fd.append("uploadfile", file);
+            fd.append('path', 'upload/');
+            /* 
+                set the desired reponse type :
+    
+                    html - outputs an HTML formatted page suitable for display and sends
+                        and event to the parent if located in an iframe.
+    
+                    json - outputs a JSON formatted string, this is the default
+            */
+            fd.append('rtype', 'json');
+            fd.append('uploadfile', file);
             xhr.send(fd);
         }
     </script>

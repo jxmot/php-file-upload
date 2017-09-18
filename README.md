@@ -32,9 +32,13 @@ Notes and demonstration code for uploading files using PHP
 
 # History
 
-I had been looking for a way to upload files via my browser to my website. I could have used SFTP but this was to be part of a larger application. And that application required a means to upload files.
+I had been looking for a way to upload files via my browser to my website. I could have used SFTP instead but this was to be part of a larger application. And that application required a means to upload files.
 
 After reading and researching I came accross a tutorial (<https://www.tutorialrepublic.com/php-tutorial/php-file-upload.php>) that showed me what I needed to get started.
+
+From that information I was able to create the first upload demo. It's form based and can upload *one* file at a time. 
+
+As I was reviewing the implementation details for my application I decided that uploading more than one file at a time would be better. And after a bit more reading and experimentation I determined that having the ability to "drag and drop" files for upload was exactly what I wanted.
 
 The code found in the *root* of this repository is my **modified** version of the original tutorial code. For reference purposes the original code can be found in the `/orig` folder in this repo.
 
@@ -44,18 +48,23 @@ Please keep in mind that purpose was to *customize* the original code to suit th
 
 The following is required in order to run this application :
 
-* Text editor - to modify files as needed
 * Web Server with PHP - I'm using XAMPP with PHP 5.6.31, a hosted server with PHP >= 5.0 will also work
 * A web browser - I use Chrome for testing & debugging
 * Miscellaneous files to upload (*.htm, .html, .md, and .txt*)
 
-
 # Application Overview
 
-This application consists of two PHP files - 
+There are 2 demo applications :
 
-* index.php (*this file was named `file-upload-form.php`, the original can be found in `/orig`*)
-* upload.php (*this file was named `upload-manager.php`, the original can be found in `/orig`*)
+* Form based file upload - 
+    * index.php (*this file was named `file-upload-form.php`, the original can be found in `/orig`*)
+    * upload.php (*this file was named `upload-manager.php`, the original can be found in `/orig`*)
+
+* Drag and drop file upload - 
+    * index-dnd.html
+    * upload-dnd.php
+
+# Form Based File Upload
 
 ## Changed Behaviors
 
@@ -78,23 +87,31 @@ The following items have been modified :
     * Changed the uploaded file size calculation from `($filesize / 1024)` to `(($filesize / 1024) | 0)` which removes digits to the *right* of the decimal point.
     * The logic around the calls to `die()` have been rewritten to fall through to the event trigger. The event payload contains an error code and an error message string.
 
-# Running the Application
+# Running the Applications
 
 Place the following into a folder within the *document root* of your server -
 
 ```
 / document root folder
       |
-      ---- test/                <- you will create this folder
+      ---- test/                    <- you will create this folder
               |
-              ---- index.php    <- add this file to the new folder
+              ---- index.php        <- add this file to the new folder
               |
-              ---- upload.php   <- add this one
+              ---- upload.php       <- add this one
               |
-              ---- phpinfo.php  <- and this one too, just in case
               |
-              ---- upload/      <- this folder must be created              
+              ---- index-dnd.html   <- file drag and drop demo
+              |
+              ---- upload-dnd.pnp   <- modified version of upload.php
+              |
+              |
+              ---- phpinfo.php      <- and this one too, just in case
+              |
+              ---- upload/          <- this folder must be created            
 ```
+
+## Form Based File Upload
 
 **NOTE :** I was using *Chrome* during the following steps :
 
@@ -103,7 +120,7 @@ Open your browser and point it to the server - `http://your-server/test/`
 You *should* see the following - 
 
 <p align="center">
-  <img src="./mdimg/screenshot-1.png" alt="Index Page" txt="Index Page"/>
+  <img src="./mdimg/screenshot-1.png" alt="Index Page" txt="Index Page" style="border: 2px solid black"/>
 </p>
 
 The click on the **Choose File** button and select a file to upload. This application will accept .htm, .html, .md, and .txt files.
@@ -113,30 +130,30 @@ Once you've seleted a file its name will appear next to the **Choose File** butt
 Then click the **Upload** button and you should see this - 
 
 <p align="center">
-  <img src="./mdimg/screenshot-2.png" alt="Index Page - successful file upload" txt="Index Page - successful file upload"/>
+  <img src="./mdimg/screenshot-2.png" alt="Index Page - successful file upload" txt="Index Page - successful file upload" style="border: 2px solid black"/>
 </p>
 
-## How it Works
+### How it Works
 
-### Load index
+#### Load index
 
 <p align="center">
   <img src="./mdimg/flow-1.png" alt="Index Page Load" txt="Index Page Load Flow Chart"/>
 </p>
 
-### Begin Upload
+#### Begin Upload
 
 <p align="center">
   <img src="./mdimg/flow-2.png" alt="Index Page Upload File Begin" txt="Index Page Begin Upload"/>
 </p>
 
-### Upload File and Verify
+#### Upload File and Verify
 
 <p align="center">
   <img src="./mdimg/flow-3.png" alt="Upload Page Upload and Verify" txt="Upload Page Upload and Verify"/>
 </p>
 
-### Respond with Status
+#### Respond with Status
 
 <p align="center">
   <img src="./mdimg/flow-4.png" alt="Upload Page Upload and Verify" txt="Upload Page Upload and Verify"/>
@@ -233,48 +250,33 @@ FireFox pretty much looks and operates the same as Chrome.
 
 ### Microsoft Edge
 
+#### Form Based File Upload
+
 This is a little different. After the file is selected the path + file name will show up in a read-only text-like control to the left of the *Browse...* button.
 
 <p align="center">
   <img src="./mdimg/screenshot-3.png" alt="Index Page - successful file upload" txt="Index Page - successful file upload"/>
 </p>
 
-# Things I Learned Along the Way
+#### Drag and Drop File Upload
 
-Here are some things I learned as I worked on the code for this application...
-
-##  MIME Types
-
-After I had read through a few sources it appeared to me that t using the browser supplied MIME type is unreliable. 
-That's because Windows (*or the OS hosting browser*) determines the MIME type. You can view some of the types using regedit. 
-
-Go to - 
-
-   `Computer\HKEY_CLASSES_ROOT\MIME\Database\Content Type`
-
-to see the default types. 
-
-**IMPORTANT:** I do NOT recommend editing any of the registry entries.
-
-It appears that if a file type (".md" for example) isn't found in the registry that the default type will be  `application/octet-stream`.
-
-It's probably better to call the PHp function **mime_content_type()** to determine the file's MIME type *after it's been uploaded*. 
-
-Here are a couple of resources that I found informative :
-
-<http://php.net/manual/en/features.file-upload.post-method.php>
-
-<https://stackoverflow.com/questions/1201945/how-is-mime-type-of-an-uploaded-file-determined-by-browser>
+It seems that *Edge* does not support drag and drop. 
 
 ## Browser Differences
+
+### Form Based File Upload
 
 In addition to what was mentioned previously I have also noticed that the file dialog is different between FireFox and Chrome. In Firefox the discrete file types are seen in the drop-down. But in chrome you will only see "Custom Files".
 
 It's even more different in IE/Edge, there when a file is selected IE/Edge will display the file path in a read-only text box to the left of the file selection button (*which is also labeled differently*).
 
+### Drag and Drop File Upload
+
+There are no visible differences between Chrome and FireFox. As noted earlier Microsoft Edge does not support file drag and drop.
+
 # Summary
 
-This was fun. It took me about a day to tinker with the original code and create this repository. And I'm very happy with the results.
+This was fun. It took me about a day or two to tinker with the original code and create this repository. And I'm very happy with the results.
 
 # To Do
 
