@@ -1,6 +1,13 @@
+purpose: server side PHP code
 source: https://www.tutorialrepublic.com/php-tutorial/php-file-upload.php
 file(s): file-upload-form.php, upload-manager.php
 
+purpose: client side HTML form
 source: https://www.webcodegeeks.com/html5/html5-file-upload-example/
 file(s): html5-file-upload-example.zip
+
+purpose: client side javascript drag and drop
+source: https://www.html5rocks.com/en/tutorials/file/dndfiles/
+file(s): none, copied code out page and gleaned CSS from it
+
 

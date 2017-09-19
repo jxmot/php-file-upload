@@ -23,6 +23,8 @@
             text-align: center;
             font: 20pt bold 'Vollkorn';
             color: #bbb;
+            width: 80%;
+            margin: 0 auto;
         }
     </style>
 
@@ -34,8 +36,10 @@
     <p id="statusmsg"></p>
 
     <script>
-        // obtained from - 
+        // partially obtained from - 
         //      https://www.html5rocks.com/en/tutorials/file/dndfiles/
+        //
+        // except $('#statusmsg').empty() and MIME comments
         //
         function handleFileSelect(evt) {
             evt.stopPropagation();
@@ -47,12 +51,18 @@
         
             var output = [];
             for(var ix = 0, file; file = files[ix]; ix++) {
-                // NOTE: This is another place where the MIME typs is wrong. 
+                // NOTE: This is another place where the MIME types can be 
+                // wrong. 
+                // 
                 // For example, a .md file is text/plain but here file.type
-                // is undefined. And it seems that application/octet-stream
-                // is the "default". The odd thing is that the POST handler
-                // (upload_dnd.php) can check the file and see the correct
+                // is undefined. This happens because it's up to the client's
+                // OS to determine the file type. And in the case of Windows
+                // it seems that application/octet-stream is the "default". 
+                // 
+                // The work-around used here is that the POST handler (written 
+                // in php) will check the file directly and see its correct 
                 // MIME type.
+                //
                 output.push('<li><strong>', escape(file.name), '</strong> (', file.type || 'n/a', ') - ',
                             file.size, ' bytes, last modified: ',
                             file.lastModifiedDate ? file.lastModifiedDate.toLocaleDateString() : 'n/a',
@@ -78,11 +88,10 @@
         // partially obtained from - 
         //      https://www.webcodegeeks.com/html5/html5-file-upload-example/
         // 
-        // except $('#statusmsg').html(...)
+        // except $('#statusmsg').html(...) and some other stuff
         //
         function uploadFile(file) {
-            //var url = 'upload-dnd.php';
-            var url = '_scratch.php';
+            var url = 'upload.php';
             var xhr = new XMLHttpRequest();
             var fd = new FormData();
             xhr.open("POST", url, true);
@@ -94,6 +103,7 @@
                     $('#statusmsg').html('Upload Result : [' + resp.detail.status.msg + '] code = ' + resp.detail.status.code);
                 }
             };
+            // desired destination path on the server
             fd.append('path', 'upload/');
             /* 
                 set the desired reponse type :
@@ -104,6 +114,7 @@
                     json - outputs a JSON formatted string, this is the default
             */
             fd.append('rtype', 'json');
+            // here's the file...
             fd.append('uploadfile', file);
             xhr.send(fd);
         }

@@ -7,32 +7,31 @@ Notes and demonstration code for uploading files using PHP
 * [History](#history)
 * [Requirements](#requirements)
 * [Application Overview](#application-overview)
-    * [Changed Behaviors](#changed-behaviors)
 * [Running the Application](#running-the-application)
-    * [How it Works](#how-it-works)
-        * [Load index](#load-index)
-        * [Begin Upload](#begin-upload)
-        * [Upload File and Verify](#upload-file-and-verify)
-        * [Respond with Status](#respond-with-status)
+    * [Form Based File Upload](#form-based-file-upload)
+        * [Upload Complete Event](#upload-complete-event)
+    * [Drag and Drop File Upload](#drag-and-drop-file-upload)
+        * [Drag and Drop Upload Response](#drag-and-drop-upload-response)
     * [Success Indicators](#success-indicators)
     * [Failure Indicators](#failure-indicators)
         * [Error Codes and Messages](#error-codes-and-messages)
         * [Trouble Shooting](#trouble-shooting)
-    * [Browser Behaviors](#browser-behaviors)
-        * [Chrome](#chrome)
-        * [FireFox](#fireFox)
-        * [Microsoft Edge](#nicrosoft-edge)
+    * [Choosing an HTML or JSON POST Response](#choosing-an-html-or-json-post-response)
+    * [Changing the Upload Path](#changing-the-upload-path)
+* [Browser Behaviors](#browser-behaviors)
+    * [Chrome](#chrome)
+    * [FireFox](#fireFox)
+    * [Microsoft Edge](#nicrosoft-edge)
+        * [Upload Via Form](#upload-via-form)
+        * [Upload Via Drag and Drop](#upload-via-drag-and-drop)
+    * [Additional Differences](#additional-differences)
 * [Things I Learned Along the Way](#things-i-learned-along-the-way)
     * [MIME Types](#mime-types)
-    * [Browser Differences](#browser-differences)
 * [Summary](#summary)
-* [To Do](#to-do)
-    * [Fix Extension and MIME Type Checking](#fix-extension-and-mime-type-checking) 
-        * [Status](#status)
 
 # History
 
-I had been looking for a way to upload files via my browser to my website. I could have used SFTP instead but this was to be part of a larger application. And that application required a means to upload files.
+I had been looking for a way to upload files via a browser to my website. I could have used SFTP instead but this was to be part of a larger application. And that application required a way to upload files.
 
 After reading and researching I came accross a tutorial (<https://www.tutorialrepublic.com/php-tutorial/php-file-upload.php>) that showed me what I needed to get started.
 
@@ -40,9 +39,16 @@ From that information I was able to create the first upload demo. It's form base
 
 As I was reviewing the implementation details for my application I decided that uploading more than one file at a time would be better. And after a bit more reading and experimentation I determined that having the ability to "drag and drop" files for upload was exactly what I wanted.
 
-The code found in the *root* of this repository is my **modified** version of the original tutorial code. For reference purposes the original code can be found in the `/orig` folder in this repo.
+So that led me to another tutorial at <https://www.html5rocks.com/en/tutorials/file/dndfiles/> which explained how a drag and drop worked.
 
-Please keep in mind that purpose was to *customize* the original code to suit the requirements of my application.
+The code found in the *root* of this repository is my **modified** version of the original tutorial code that I had found. For reference purposes the original code can be found in the `/orig` folder in this repo.
+
+Please keep in mind that purpose was to *customize* the original code to suit the requirements of my application. And those are - 
+
+* Easily and quickly upload one or more files
+* Client code must be easily adapted to fully programmatic operation
+* The code must be flexible enough to manage file upload forms and other upload methods (*i.e. drag and drop*)
+* The upload code must return a status after the upload operation is complete
 
 # Requirements
 
@@ -56,59 +62,37 @@ The following is required in order to run this application :
 
 There are 2 demo applications :
 
-* Form based file upload - 
-    * index.php (*this file was named `file-upload-form.php`, the original can be found in `/orig`*)
-    * upload.php (*this file was named `upload-manager.php`, the original can be found in `/orig`*)
+* Form based file upload, one file at a time
+    * index.php
 
-* Drag and drop file upload - 
+* Drag and drop file upload, one or more files at a time - 
     * index-dnd.html
-    * upload-dnd.php
 
-# Form Based File Upload
+Both demos send a POST request for `upload.php` to achieve an upload. And the type of response that `upload.php` returns is selectable by the client. The two choices are - 
 
-## Changed Behaviors
-
-The following items have been modified : 
-
-* File types - I've modified the original code to accept: .htm, .html, .md, and .txt *instead* of .jpg, .jpeg, .gif, and .png
-* Added comments everywhere.
-
-* `index.php` behavior:
-    * The original code would redirect to the page output created by `upload.php` (*originally* `file-upload-form.php`). I've modified the form with `target="file-iframe"`.
-    * Found a missing closing `>`, added it.
-    * Changed the *name* of the `<input type="file">` tag from `photo` to `uploadfile`.
-    * Added the style `style="width:25%;"` to `<input type="file">` so that the upload path+file is visible in browsers that display it.
-    * Added an `iframe`, this will contain the output from `upload.php`.
-    * Added a listener for an event trigger. This event is sent from `upload.php` and is used to indicate completion. It will be triggered on success or failure to upload. __*see details below*__
-    * Added a *hidden* text field. It contains the upload destination path, and will be used instead of what *was* hardcoded previously.
-
-* `upload.php` behavior :
-    * Added an `else` to `if($_SERVER["REQUEST_METHOD"] == "POST")`.
-    * Changed the uploaded file size calculation from `($filesize / 1024)` to `(($filesize / 1024) | 0)` which removes digits to the *right* of the decimal point.
-    * The logic around the calls to `die()` have been rewritten to fall through to the event trigger. The event payload contains an error code and an error message string.
+* JSON string
+* HTML file, with an event that passes a JSON object. However in order to receive the event the form `target` should point to an *iframe*.
 
 # Running the Applications
 
-Place the following into a folder within the *document root* of your server -
+Place the following files into a folder within the *document root* of your server -
 
 ```
 / document root folder
       |
-      ---- test/                    <- you will create this folder
+      ---- test/                    <- you will create this folder and
+              |                        add the remaining files and folder
               |
-              ---- index.php        <- add this file to the new folder
-              |
-              ---- upload.php       <- add this one
-              |
+              ---- index.php        <- file picking form demo
               |
               ---- index-dnd.html   <- file drag and drop demo
               |
-              ---- upload-dnd.pnp   <- modified version of upload.php
+              ---- upload.pnp       <- POST request handler
               |
               |
               ---- phpinfo.php      <- and this one too, just in case
               |
-              ---- upload/          <- this folder must be created            
+              ---- upload/          <- this folder must be created before uploading            
 ```
 
 ## Form Based File Upload
@@ -127,39 +111,52 @@ The click on the **Choose File** button and select a file to upload. This applic
 
 Once you've seleted a file its name will appear next to the **Choose File** button.
 
-Then click the **Upload** button and you should see this - 
+Then click the **Upload** button and you should see something like this - 
 
 <p align="center">
   <img src="./mdimg/screenshot-2.png" alt="Index Page - successful file upload" txt="Index Page - successful file upload" style="border: 2px solid black"/>
+  <br><i>this image may differ from the application</i>
 </p>
 
-### How it Works
+### Upload Complete Event
 
-#### Load index
+After the file upload operation has completed, regardless of success or failure an event is triggered in `upload.php`. However it will only be recieved if the form in `index.php` has its target pointing to an iframe tag.
+
+This event also carries some data in the form of an object. To see its contents open the *developer tools* for your browser and observe the *console*. You should see something like this - 
+
+```
+GOT IT : {"detail": {"file": "faq.md", "type": "text/html", "size": 2056, "path": "upload/", "status": {"msg": "The file faq.md uploaded successfully", "code": 0}}}
+```
+
+## Drag and Drop File Upload
+
+**NOTE :** I was using *Chrome* during the following steps :
+
+Open your browser and point it to the server - `http://your-server/test/index-dnd.html`
+
+You *should* see the following - 
 
 <p align="center">
-  <img src="./mdimg/flow-1.png" alt="Index Page Load" txt="Index Page Load Flow Chart"/>
+  <img src="./mdimg/screenshot-4.png" alt="Index Page Drag and Drop" txt="Index Page Drag and Drop" style="border: 2px solid black"/>
 </p>
 
-#### Begin Upload
+Open a file explorer and navigate to a folder were you have some *.htm, *.html, *.txt, or *.md files. Select and drag one of the files into the dash bordered box and release it. You should see something like this - 
 
 <p align="center">
-  <img src="./mdimg/flow-2.png" alt="Index Page Upload File Begin" txt="Index Page Begin Upload"/>
+  <img src="./mdimg/screenshot-5.png" alt="Index Page Drag and Drop" txt="Index Page Drag and Drop" style="border: 2px solid black"/>
 </p>
 
-#### Upload File and Verify
+### Drag and Drop Upload Response
 
-<p align="center">
-  <img src="./mdimg/flow-3.png" alt="Upload Page Upload and Verify" txt="Upload Page Upload and Verify"/>
-</p>
+After the file upload operation has completed, regardless of success or failure `upload.php` will respond with a JSON string. You should see something like this -
 
-#### Respond with Status
-
-<p align="center">
-  <img src="./mdimg/flow-4.png" alt="Upload Page Upload and Verify" txt="Upload Page Upload and Verify"/>
-</p>
+```
+GOT IT : {"detail": {"file": "faq.md", "type": "text/html", "size": 2056, "path": "upload/", "status": {"msg": "The file faq.md uploaded successfully", "code": 0}}}
+```
 
 ## Success Indicators
+
+This section covers both upload methods.
 
 This time open the *developers tool* window by right-clicking anywhere on the displayed page. Refresh the browser to reload the page. Then run the application again and upload a different file. Notice the console pane in the developer tool window, and should see output similar to this - 
 
@@ -201,22 +198,23 @@ If `{status : {code}}` is any value *less than zero* an error has occured. Here'
 
 ### Error Codes and Messages
 
-The following errors are possible, and announced via the data sent in the `upload_complete_evt` event.
+The following errors are possible, and announced via the data sent in the `upload_complete_evt` event **or** via the POST response.
 
-* **msg:** "The file FILE.EXT uploaded successfully" **code:** 0
-* **msg:** "FILE.EXT already exists in PATH" **code:** -1
-* **msg:** "the file type .EXT is not allowed" **code:** -2 
-* **msg:** upload error - ERROR_INFO"" **code:** -3
-* **msg:** "bad request - METHOD" **code:** -4
-* **msg:** "Please select a valid file format, .EXT is not allowed" **code:** -5
-* **msg:** "File size of XXXX is larger than the allowed limit of YYYY" **code:** -6
+* **msg:** "Bad request - METHOD" **code:** -1
+* **msg:** "Upload error - ERROR_INFO" **code:** -2
+* **msg:** "Please select a valid file format, .EXT is not allowed" **code:** -3
+* **msg:** "The file type MIMETYPE is not allowed" **code:** -4
+* **msg:** "File size of XXXX is larger than the allowed limit of YYYY" **code:** -5
+* **msg:** "A file named FILE.EXT already exists in PATH" **code:** -6
 * **msg:** "The file FILE.EXT could not be moved to PATH" **code:** -7
+* **msg:** "The file FILE.EXT uploaded successfully" **code:** 0
 
 Most of the messages are self explanatory, but here is the meaning of the text in upper case :
 
 * FILE.EXT - the file name plus extension of the file that was to be uploaded
 * PATH - the final destination of the uploaded file
 * .EXT - the extension of the uploaded file
+* MIMETYPE - a MIME type string like "text/plain".
 * ERROR_INFO - a string obtained in `upload.php`, it comes from `$_FILES["uploadfile"]["error"]`
 * METHOD - the method used when `upload.php` was requested
 * XXXX - the size in bytes of the file
@@ -232,7 +230,37 @@ Try checking the following -
 * Does the `upload` folder exist where `index.php` and `upload.php` are kept?
 * Did you have a *good* breakfast today?
 
-## Browser Behaviors
+## Choosing an HTML or JSON POST Response
+
+There is a data item in the POST request called `rtype` (*response type*). In the form it's kept in a hidden input - 
+
+```
+<input hidden type="text" id="uploadresp" name="rtype" value="html">
+```
+
+And in the no-form demo an item is added to the `FormData` - 
+
+```
+fd.append('rtype', 'json');
+```
+
+## Changing the Upload Path
+
+The default path for uploads is `upload/`. And is set the same as the response type described above.
+
+In the form - 
+
+```
+<input hidden type="text" id="uploadpath" name="path" value="upload/">
+```
+
+No-form - 
+
+```
+fd.append('path', 'upload/');
+```
+
+# Browser Behaviors
 
 I tested with three browsers : 
 
@@ -240,17 +268,17 @@ I tested with three browsers :
 * Google Chrome 61.0.3163.91 (Official Build) (64-bit) - my primary testing & debug browser
 * Microsoft Edge 40.15063.0.0
 
-### Chrome
+## Chrome
 
 The page images used in this document came from a Chrome rendering of the page(s);
 
-### FireFox
+## FireFox
 
 FireFox pretty much looks and operates the same as Chrome.
 
-### Microsoft Edge
+## Microsoft Edge
 
-#### Form Based File Upload
+### Upload Via Form
 
 This is a little different. After the file is selected the path + file name will show up in a read-only text-like control to the left of the *Browse...* button.
 
@@ -258,99 +286,42 @@ This is a little different. After the file is selected the path + file name will
   <img src="./mdimg/screenshot-3.png" alt="Index Page - successful file upload" txt="Index Page - successful file upload"/>
 </p>
 
-#### Drag and Drop File Upload
+### Upload via Drag and Drop
 
 It seems that *Edge* does not support drag and drop. 
 
-## Browser Differences
-
-### Form Based File Upload
+## Additional Differences
 
 In addition to what was mentioned previously I have also noticed that the file dialog is different between FireFox and Chrome. In Firefox the discrete file types are seen in the drop-down. But in chrome you will only see "Custom Files".
 
-It's even more different in IE/Edge, there when a file is selected IE/Edge will display the file path in a read-only text box to the left of the file selection button (*which is also labeled differently*).
-
-### Drag and Drop File Upload
-
-There are no visible differences between Chrome and FireFox. As noted earlier Microsoft Edge does not support file drag and drop.
+# Things I Learned Along the Way 
+ 
+Here are some things I learned as I worked on the code for this application... 
+ 
+##  MIME Types 
+ 
+After I had read through a few sources it appeared to me that t using the browser supplied MIME type is unreliable.  
+That's because Windows (*or the OS hosting browser*) determines the MIME type. You can view some of the types using regedit. Go to -  
+ 
+   `Computer\HKEY_CLASSES_ROOT\MIME\Database\Content Type` 
+ 
+to *see* the default types.  
+ 
+**IMPORTANT:** I do NOT recommend editing any of the registry entries. 
+ 
+It appears that if a file type (".md" for example) isn't found in the registry that the default type will be  `application/octet-stream`. 
+ 
+It's better to call the PHP function **mime_content_type()** to determine the file's MIME type *after it's been uploaded*.  
+ 
+Here are a couple of resources that I found informative : 
+ 
+<http://php.net/manual/en/features.file-upload.post-method.php> 
+ 
+<https://stackoverflow.com/questions/1201945/how-is-mime-type-of-an-uploaded-file-determined-by-browser> 
 
 # Summary
 
-This was fun. It took me about a day or two to tinker with the original code and create this repository. And I'm very happy with the results.
+This was fun. It took me few days to tinker with the original code and create this repository. And I'm very happy with the results.
 
-# To Do
 
-## Fix Extension and MIME Type Checking
-
-**Condition:**
-
-In `upload.php` examine how `$allowed` is being used. In the original code and in the early version of my modified code `$allowed` is an *associative array*. However, it isn't being used as such except by calling `array_key_exists()` when the uploaded file extension is checked. 
-
-Later on in the code `in_array()` is called when the MIME type is checked. 
-
-**Problem:**
-
-The code does not make any association between the extension (*a key to* `$array`) and the type. Depending on how `$allow` is filled in the checks of extension and type will *pass*. This is true even if the extension and type are **not** actually associated.
-
-**Example:**
-
-Using the following - 
-```
-$allowed = array("htm" => "text/html", "html" => "text/html", "md" => "text/html", "txt" => "text/plain", "bin" => "application/octet-stream");
-```
-
-When a file of the type `md` is uploaded the browser will interpret it as `application/octet-stream`. Even though it is really `text/html`. So that means the extension check will pass, and so will the type check. But for the wrong reason. This will be true for any allowed extension.
-
-**Solution:**
-
-The solution I have chosen (*implemented in my modified code*) is to ignore the file type provided by the browser. Instead the file type is determined by calling `mime_content_type()` on the file *after* it's been uploaded. The type returned by that function will be correct. See [MIME Types](#mime-types) for more information. And for a lengthy list of MIME types see - 
-
-<https://www.freeformatter.com/mime-types-list.html#mime-types-list>
-
-At this point the use of an associative array (`$allowed`) does not serve any real puropose unless a code modification is made. Here is a psuedo code description of the modification - 
-
-**Original/Current:**
-
-```php
-
-  // This is the real file type...
-  $filetype = mime_content_type($tmpfile);
-  
-  // The original extension test - 
-  if(!array_key_exists($ext, $allowed)) {
-      // ERROR!
-  } else {
-  
-      // execute some code
-    
-      // check the file type
-      if(in_array($filetype, $allowed)) {
-          // execute some code
-      } else {
-          // ERROR!
-      }
-  }
-
-```
-
-**Modification:**
-
-```php
-
-  // This is the real file type...
-  $filetype = mime_content_type($tmpfile);
-  
-  // The modified test, making use of the assocative 
-  // aspects of the aray - 
-  if((array_key_exists($ext, $allowed) && ($allowed[$ext] === $filetype)) {
-      // execute some code
-  } else {
-      // ERROR!
-  }
-
-```
-
-### Status
-
-This is a *work in progress*. So far I've partially implemented it, the code will ignore the browser supplied MIME type. The next step is to rewrite the portion of code that checks the file.
 
