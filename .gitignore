@@ -5,10 +5,10 @@ _*.*
 node_modules
 /_*
 /nbproject
-/upload
+#/upload
 # misc stuff i want to ignore -
 *.log
-*.txt
+#*.txt
 *.bat
 .DS_Store
 # Files created by winmerge - 
