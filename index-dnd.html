@@ -3,121 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>File Upload - Drag and Drop</title>
+    <link rel="stylesheet" href="assets/css/filedrop.css">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 </head>
 <body>
-    <style>
-        <!-- obtained from - 
-                https://www.webcodegeeks.com/html5/html5-file-upload-example/
-        -->
-        .example {
-            padding: 10px;
-            border: 1px solid #ccc;
-        }
-        #drop_zone {
-            border: 2px dashed #bbb;
-            -moz-border-radius: 5px;
-            -webkit-border-radius: 5px;
-            border-radius: 5px;
-            padding: 25px;
-            text-align: center;
-            font: 20pt bold 'Vollkorn';
-            color: #bbb;
-            width: 80%;
-            margin: 0 auto;
-        }
-    </style>
-
-    <div class="example">
-        <div id="drop_zone">Drop files here</div>
-        <output id="list"></output>
+    <div class="drop-container">
+        <div id="drop_zone" class="drop-box">Drop files here</div>
     </div>
 
-    <p id="statusmsg"></p>
+    <div>
+        <output id="drop_list"></output>
+    </div>
 
-    <script>
-        // partially obtained from - 
-        //      https://www.html5rocks.com/en/tutorials/file/dndfiles/
-        //
-        // except $('#statusmsg').empty() and MIME comments
-        //
-        function handleFileSelect(evt) {
-            evt.stopPropagation();
-            evt.preventDefault();
-        
-            $('#statusmsg').empty();
-
-            var files = evt.dataTransfer.files;
-        
-            var output = [];
-            for(var ix = 0, file; file = files[ix]; ix++) {
-                // NOTE: This is another place where the MIME types can be 
-                // wrong. 
-                // 
-                // For example, a .md file is text/plain but here file.type
-                // is undefined. This happens because it's up to the client's
-                // OS to determine the file type. And in the case of Windows
-                // it seems that application/octet-stream is the "default". 
-                // 
-                // The work-around used here is that the POST handler (written 
-                // in php) will check the file directly and see its correct 
-                // MIME type.
-                //
-                output.push('<li><strong>', escape(file.name), '</strong> (', file.type || 'n/a', ') - ',
-                            file.size, ' bytes, last modified: ',
-                            file.lastModifiedDate ? file.lastModifiedDate.toLocaleDateString() : 'n/a',
-                            '</li>');
-
-                uploadFile(file);
-            }
-            document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
-        }
-        
-        function handleDragOver(evt) {
-            evt.stopPropagation();
-            evt.preventDefault();
-            // Explicitly show this is a copy.
-            evt.dataTransfer.dropEffect = 'copy';
-        }
-        
-        // Setup the dnd listeners.
-        var dropZone = document.getElementById('drop_zone');
-        dropZone.addEventListener('dragover', handleDragOver, false);
-        dropZone.addEventListener('drop', handleFileSelect, false);
-
-        // partially obtained from - 
-        //      https://www.webcodegeeks.com/html5/html5-file-upload-example/
-        // 
-        // except $('#statusmsg').html(...) and some other stuff
-        //
-        function uploadFile(file) {
-            var url = 'upload.php';
-            var xhr = new XMLHttpRequest();
-            var fd = new FormData();
-            xhr.open("POST", url, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    // Every thing ok, file uploaded
-                    console.log('GOT IT : ' + xhr.responseText);
-                    var resp = JSON.parse(xhr.responseText);
-                    $('#statusmsg').html('Upload Result : [' + resp.detail.status.msg + '] code = ' + resp.detail.status.code);
-                }
-            };
-            // desired destination path on the server
-            fd.append('path', 'upload/');
-            /* 
-                set the desired reponse type :
-    
-                    html - outputs an HTML formatted page suitable for display and sends
-                        and event to the parent if located in an iframe.
-    
-                    json - outputs a JSON formatted string, this is the default
-            */
-            fd.append('rtype', 'json');
-            // here's the file...
-            fd.append('uploadfile', file);
-            xhr.send(fd);
-        }
-    </script>
+    <script src="assets/js/filedrop.js"></script>
 </body>
 </html>
