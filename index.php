@@ -37,9 +37,8 @@
          MIME type. However, with the code below it isn't possible to check the 
          type prior to initiating the form's "action".
 
-    <form action="upload.php" method="post" enctype="multipart/form-data" target="file-iframe">
     -->
-    <form action="_scratch.php" method="post" enctype="multipart/form-data" target="file-iframe">
+    <form action="upload.php" method="post" enctype="multipart/form-data" target="file-iframe">
         <h2>Upload File</h2>
         <label for="fileSelect">Filename:</label>
         <!-- Also see : https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file -->
