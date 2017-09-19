@@ -23,6 +23,8 @@
             text-align: center;
             font: 20pt bold 'Vollkorn';
             color: #bbb;
+            width: 80%;
+            margin: 0 auto;
         }
     </style>
 
@@ -89,7 +91,7 @@
         // except $('#statusmsg').html(...) and some other stuff
         //
         function uploadFile(file) {
-            var url = 'upload-dnd.php';
+            var url = 'upload.php';
             var xhr = new XMLHttpRequest();
             var fd = new FormData();
             xhr.open("POST", url, true);
