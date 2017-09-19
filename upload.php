@@ -1,136 +1,129 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>File Upload Form</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-</head>
-<body>
 <?php
-// will be copied in to the event data payload a the end of this file
-$error = 0;
-$errmsg = "success";
+/*
+    upload.php - Uploads files via a POST request. It responds with a JSON
+    string.
 
-// placed here due to needed scope
-$filename  = "";
-$filetype  = "";
-$filesize  = "";
-$filepath  = "";
-$tmpfile   = "";
-$ufiletype = "";
+*/
+$error     = 0;
+$errmsg    = "";
+$filename  = "n/a";
+$filetype  = "n/a";
+$filesize  = 0;
+$filepath  = "n/a";
+$resptype  = "n/a";
+$_filetype = "n/a";
 
-// Check if the form was submitted
-if($_SERVER["REQUEST_METHOD"] == "POST") {
-
+// Verify that the correct method was used
+if($_SERVER["REQUEST_METHOD"] === "POST") {
     // Check if file was uploaded without errors
-    if(isset($_FILES["uploadfile"]) && $_FILES["uploadfile"]["error"] == 0) {
-
-        $allowed = array("htm" => "text/html", "html" => "text/html", "md" => "text/html", "txt" => "text/plain");
-
+    if(isset($_FILES["uploadfile"]) && ($_FILES["uploadfile"]["error"] === 0)) {
+        // valid file types and extensions
+        // edit as needed
+        $valid_types = array("text/html", "text/plain");
+        $valid_exts  = array("htm", "html", "md", "txt" );
+        // necessary pieces of file information
         $filename = $_FILES["uploadfile"]["name"];
-
-        // NOTE: This is the browser supplied file type, which 
-        // is totally wrong in most cases. Don't use it. It will 
-        // be a LIE! Instead check the file type of the file
-        // after it's been uploaded to the temporary folder.
-        //
-        // see : https://stackoverflow.com/questions/1201945/how-is-mime-type-of-an-uploaded-file-determined-by-browser
-        // 
-        // BAD :
-        // $filetype = $_FILES["uploadfile"]["type"];
-        // GOOD :
         $tmpfile  = $_FILES["uploadfile"]["tmp_name"];
-        // UGLY: The exact location is determined by settings 
-        // in your HTTP server.
-    
-        // This is the real file type...
-        $filetype = mime_content_type($tmpfile);
-
         $filesize = $_FILES["uploadfile"]["size"];
         $filepath = $_POST["path"];
-
-        echo "File Name : " . $filename . "<br>\n";
-        echo "File Type : " . $filetype . "<br>\n";
-        echo "File Size : " . (($filesize / 1024) | 0) . " KB<br>\n";
-
-        echo "Uploaded to : {$tmpfile}<br><br><br>\n";
-
-        // Verify file extension
+        $resptype = $_POST["rtype"];
+        // extract the extension from the file name
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
+        // This is the real file type...
+        $filetype = mime_content_type($tmpfile);
+        // this can be wrong for some file types, it's up 
+        // to the client's OS to determine the type.
+        $_filetype = $_FILES["uploadfile"]["type"];
+
         // is the extension allowed?
-        if(!array_key_exists($ext, $allowed)) {
+        if(!in_array($ext, $valid_exts)) {
             $errmsg = "Please select a valid file format, {$ext} is not allowed";
-            $error  = -5;
-            echo "Error: " . $errmsg . "<br>\n";
+            $error  = -3;
         } else {
-            // Verify file size - 100k maximum
-            $maxsize = 100 * 1024;
-            if($filesize > $maxsize) {
-                $errmsg = "File size of {$filesize} is larger than the allowed limit of {$maxsize}";
-                $error  = -6;
-                echo "Error: " . $errmsg . "<br>\n";
+            // Verify MIME type of the file
+            if(!in_array($filetype, $valid_types)){
+                $errmsg = "The file type {$filetype} is not allowed";
+                $error  = -4;
             } else {
-                // Verify MYME type of the file
-                if(in_array($filetype, $allowed)){
-                    // Check whether file exists before uploading it
+                // Verify file size - 100k maximum
+                $maxsize = 100 * 1024;
+                if($filesize > $maxsize) {
+                    $errmsg = "File size of {$filesize} is larger than the allowed limit of {$maxsize}";
+                    $error  = -5;
+                } else {
+                    // Check if the file exists in the destination before 
+                    // moving it from the PHP's temporary folder
                     if(file_exists($filepath . $filename)) {
-                        $errmsg = "{$filename} already exists in {$filepath}";
-                        $error  = -1;
-                        echo "Error: " . $errmsg . "<br>\n";
+                        $errmsg = "A file named {$filename} already exists in {$filepath}";
+                        $error  = -6;
                     } else {
-                        if(move_uploaded_file($_FILES["uploadfile"]["tmp_name"], $filepath . $filename)) {
-                            echo "Your file was uploaded & moved successfully.<br>\n";
-                            $ufiletype = mime_content_type($filepath . $filename);
-                            echo "uploaded file type : {$ufiletype}<br>\n";
-                            echo "path     : " . $filepath . "<br><br>\n";
-    
-                            $errmsg = "The file {$filename} uploaded successfully";
-                            $error  = 0;
-                        } else {
+                        // move it...
+                        if(!move_uploaded_file($_FILES["uploadfile"]["tmp_name"], $filepath . $filename)) {
                             $errmsg = "The file {$filename} could not be moved to {$filepath}";
                             $error  = -7;
-                            echo "Error: " . $errmsg . "<br>\n";
+                        } else {
+                            $errmsg = "The file {$filename} uploaded successfully";
+                            $error  = 0;
                         }
                     } 
-                } else {
-                    $ret = in_array($filetype, $allowed);
-                    echo "in_array : " . $ret . "<br>\n";
-                    echo "filetype : " . $filetype . "<br>\n";
-        
-                    $errmsg = "the file type {$filetype} is not allowed";
-                    $error  = -2;
-                    echo "Error: " . $errmsg . "<br>\n";
                 }
             }
         }
     } else {
         $errmsg = "upload error - {$_FILES["uploadfile"]["error"]}";
-        $error  = -3;
-        echo "Error: " . $errmsg . "<br>\n";
+        $error  = -2;
     }
 } else {
     $errmsg = "bad request - {$_SERVER["REQUEST_METHOD"]}";
-    $error  = -4;
-    echo "Error: " . $errmsg . "<br>\n";
+    $error  = -1;
 }
-?>
-<script>
-    var err      =  {
-                        msg: '<?php echo $errmsg; ?>', 
-                        code: <?php echo $error; ?>
-                    };
 
-    var fileinfo =  {
-                        file: '<?php echo $filename; ?>', 
-                        type: '<?php echo $ufiletype; ?>', 
-                        size: <?php echo $filesize; ?>, 
-                        path: '<?php echo $filepath; ?>', 
-                        status: err
-                    };
-    var event = new CustomEvent('upload_complete_evt', {detail: fileinfo});
-    window.parent.document.dispatchEvent(event);
-</script>
+if($resptype !== "html") {
+    echo "{\"detail\": {\"file\": \"{$filename}\", \"type\": \"{$filetype}\", \"size\": {$filesize}, \"path\": \"{$filepath}\", \"status\": {\"msg\": \"{$errmsg}\", \"code\": {$error}}}}";
+} else {
+    echo "
+<!DOCTYPE html>\n
+<html lang=\"en\">\n
+<head>\n
+    <meta charset=\"UTF-8\">\n
+    <title>File Upload Results</title>\n
+    <script src=\"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js\"></script>\n
+</head>\n
+<body>\n
+    <p>";
+    echo "        <h3>{$errmsg}</h3>";
+    echo "        File Name : {$filename}<br>";
+    echo "        File Type : {$filetype}<br>";
+    if($error >= 0) {
+        $kb = ($filesize / 1024) | 0;
+        echo "        File Size : {$kb} KB<br>";
+        echo "        Uploaded to : {$tmpfile}<br>";
+        echo "        Moved to :  {$filepath}{$filename}<br>";
+    }
+    echo "        <br><br>";
+    echo "    </p><br>";
+
+    echo "
+    <script>
+        var err      =  {
+                            msg: '{$errmsg}', 
+                            code: {$error}
+                        };
+    
+        var fileinfo =  {
+                            file: '{$filename}', 
+                            type: '{$filetype}', 
+                            size:  {$filesize}, 
+                            path: '{$filepath}', 
+                            status: err
+                        };
+        var event = new CustomEvent('upload_complete_evt', {detail: fileinfo});
+        window.parent.document.dispatchEvent(event);
+    </script>
 </body>
 </html>
+";
+}
+?>
 
