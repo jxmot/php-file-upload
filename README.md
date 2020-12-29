@@ -323,5 +323,5 @@ Here are a couple of resources that I found informative :
 
 This was fun. It took me few days to tinker with the original code and create this repository. And I'm very happy with the results.
 
-
-
+---
+<img src="http://webexperiment.info/extcounter/mdcount.php?id=php-file-upload">
