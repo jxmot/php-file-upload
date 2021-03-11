@@ -73,7 +73,7 @@ Both demos send a POST request for `upload.php` to achieve an upload. And the ty
 * JSON string
 * HTML file, with an event that passes a JSON object. However in order to receive the event the form `target` should point to an *iframe*.
 
-# Running the Applications
+# Running the Application
 
 Place the following files into a folder within the *document root* of your server -
 
